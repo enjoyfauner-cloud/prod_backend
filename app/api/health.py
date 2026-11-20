@@ -8,7 +8,7 @@ from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from app.errors import error_body
+from app.errors import error_response
 
 router = APIRouter(tags=["service"])
 logger = logging.getLogger("app.health")
@@ -31,10 +31,7 @@ async def ready(request: Request) -> Response:
             await conn.execute(text("SELECT 1"))
     except Exception as exc:
         logger.warning("readiness check failed", extra={"error": repr(exc)})
-        return JSONResponse(
-            status_code=503,
-            content=error_body("service_unavailable", "База данных недоступна"),
-        )
+        return error_response(503, "service_unavailable", "База данных недоступна")
     return JSONResponse({"status": "ready"})
 
 

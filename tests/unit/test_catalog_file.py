@@ -98,3 +98,29 @@ def test_csv_import_format(tmp_path: Path) -> None:
     catalog = load_catalog_file(csv_file)
     assert len(catalog.cards) == 1
     assert len(catalog.cards[0].terms[0].rules) == 2
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "bank_code,card_code\nb,c1\n",  # нет обязательных колонок
+        "bank_code,bank_name,card_code,card_name,version,valid_from,checked_at,category,"
+        "rate_percent\nb,Б,c1,К,v1,2026-01-01,2026-01-01,other,1\n",  # версия не число
+    ],
+)
+def test_cli_rejects_broken_csv_without_traceback(
+    tmp_path: Path, content: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from app.cli import main
+
+    path = tmp_path / "bad.csv"
+    path.write_text(content, encoding="utf-8")
+    assert main(["import-catalog", str(path)]) == 2
+    assert "не прошёл проверку" in capsys.readouterr().err
+
+
+def test_cli_missing_file(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    from app.cli import main
+
+    assert main(["import-catalog", str(tmp_path / "nope.json")]) == 2
+    assert "Не удалось прочитать" in capsys.readouterr().err

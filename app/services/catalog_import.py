@@ -1,12 +1,13 @@
 """Идемпотентный импорт справочника.
 
-Естественные ключи:
+Ключи:
 - банк: code;
-- карта: (банк, название);
+- карта: code (публичный id; пара (банк, название) тоже уникальна);
 - версия условий: (карта, version).
 
-Повторный импорт того же файла ничего не дублирует: строки обновляются (upsert),
-а правила версии заменяются целиком. Всё выполняется в одной транзакции.
+Повторный импорт того же файла ничего не дублирует: строки обновляются (upsert).
+Для каждой карты из файла её версии и правила приводятся точно к содержимому файла
+(лишние удаляются). Карты, которых нет в файле, не трогаются. Всё в одной транзакции.
 """
 
 import csv
@@ -18,6 +19,7 @@ from typing import Any
 
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Bank, Card, CardTerms, CashbackRule, Category
@@ -118,16 +120,33 @@ async def import_catalog(session: AsyncSession, catalog: CatalogFile) -> ImportR
             "promo_url": card.promo_url,
             "is_demo": catalog.meta.demo,
         }
+        # Идентичность карты = code (публичный id, на него ссылаются «мои карты»).
+        # Переименование или перенос в другой банк обновляет ту же строку.
         stmt = (
             insert(Card)
             .values(**values)
             .on_conflict_do_update(
-                constraint="uq_cards_bank_id_name",
-                set_={k: v for k, v in values.items() if k not in ("bank_id", "name")},
+                index_elements=[Card.code],
+                set_={k: v for k, v in values.items() if k != "code"},
             )
             .returning(Card.id)
         )
-        card_id = (await session.execute(stmt)).scalar_one()
+        try:
+            async with session.begin_nested():
+                card_id = (await session.execute(stmt)).scalar_one()
+        except IntegrityError:
+            raise CatalogImportError(
+                f"{card.code}: у банка {card.bank} уже есть другая карта «{card.name}»"
+            ) from None
+
+        # Файл — источник правды для условий карты: версии, которых в нём нет, удаляем
+        # (правила удалятся каскадом). Иначе в БД могли бы остаться пересекающиеся периоды.
+        await session.execute(
+            delete(CardTerms).where(
+                CardTerms.card_id == card_id,
+                CardTerms.version.not_in([t.version for t in card.terms]),
+            )
+        )
 
         for terms in card.terms:
             t_values = {

@@ -9,7 +9,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import DBAPIError, OperationalError
+from sqlalchemy.exc import DBAPIError, InterfaceError, OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.observability.context import get_request_id
@@ -98,6 +98,10 @@ def _message_ru(err: Any) -> str:
         return template
 
 
+def is_connection_error(exc: DBAPIError) -> bool:
+    return isinstance(exc, OperationalError | InterfaceError) or exc.connection_invalidated
+
+
 _HTTP_CODES = {404: "not_found", 405: "method_not_allowed"}
 
 
@@ -126,10 +130,20 @@ def install_error_handlers(app: FastAPI) -> None:
         code = _HTTP_CODES.get(exc.status_code, "http_error")
         return error_response(exc.status_code, code, str(exc.detail))
 
-    @app.exception_handler(OperationalError)
     @app.exception_handler(DBAPIError)
+    async def _db_error(_: Request, exc: DBAPIError) -> JSONResponse:
+        # 503 только для проблем соединения; IntegrityError/ProgrammingError — это баги → 500.
+        if is_connection_error(exc):
+            logger.error("database unavailable", exc_info=exc)
+            return error_response(503, "service_unavailable", "База данных временно недоступна")
+        logger.error("unhandled database error", exc_info=exc)
+        return error_response(500, "internal_error", "Внутренняя ошибка сервера")
+
+    # Сетевые ошибки при подключении к БД: отказ, DNS, таймаут, «Multiple exceptions»
+    # (хост резолвится в IPv4 и IPv6). Все они — OSError. Файлов обработчики запросов
+    # не читают, поэтому OSError здесь означает недоступную БД.
     @app.exception_handler(OSError)
-    async def _db_down(_: Request, exc: Exception) -> JSONResponse:
+    async def _db_unreachable(_: Request, exc: Exception) -> JSONResponse:
         logger.error("database unavailable", exc_info=exc)
         return error_response(503, "service_unavailable", "База данных временно недоступна")
 

@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import get_settings
 from app.db import make_engine, make_sessionmaker
@@ -19,6 +20,12 @@ async def _import(path: Path) -> int:
     except ValidationError as exc:
         print(f"Файл {path} не прошёл проверку:\n{exc}", file=sys.stderr)
         return 2
+    except (KeyError, ValueError) as exc:  # CSV без колонки, версия не число и т. п.
+        print(f"Файл {path} не прошёл проверку: {exc!r}", file=sys.stderr)
+        return 2
+    except OSError as exc:
+        print(f"Не удалось прочитать {path}: {exc}", file=sys.stderr)
+        return 2
     settings = get_settings()
     engine = make_engine(settings)
     try:
@@ -27,6 +34,9 @@ async def _import(path: Path) -> int:
     except CatalogImportError as exc:
         print(f"Импорт отменён: {exc}", file=sys.stderr)
         return 2
+    except (SQLAlchemyError, OSError) as exc:
+        print(f"Импорт отменён, ошибка БД: {exc}", file=sys.stderr)
+        return 3
     finally:
         await engine.dispose()
     print(

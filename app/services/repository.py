@@ -7,7 +7,8 @@ from decimal import Decimal
 from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import InstrumentedAttribute, aliased, selectinload
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.models import (
     BASE_CATEGORY,
@@ -22,11 +23,19 @@ from app.models import (
 from app.services.calculator import CardOffer, Rule, Terms, Usage
 
 
-def _active_at(as_of: date):
+def _active_at(as_of: date, terms: type[CardTerms] = CardTerms):
+    """SQL-условие «версия действует на дату» (для таблицы или её псевдонима)."""
     return and_(
-        CardTerms.valid_from <= as_of,
-        or_(CardTerms.valid_to.is_(None), CardTerms.valid_to >= as_of),
+        terms.valid_from <= as_of,
+        or_(terms.valid_to.is_(None), terms.valid_to >= as_of),
     )
+
+
+def _has_active_terms(card_id: ColumnElement[int] | InstrumentedAttribute[int], as_of: date):
+    """EXISTS: у карты card_id есть действующая версия. Свой псевдоним таблицы, чтобы
+    подзапрос не «связался» с CardTerms внешнего запроса."""
+    active = aliased(CardTerms)
+    return select(active.id).where(active.card_id == card_id, _active_at(as_of, active)).exists()
 
 
 def orm_terms_to_domain(t: CardTerms) -> Terms:
@@ -134,17 +143,30 @@ async def list_cards(
     if bank:
         conditions.append(Bank.code == bank)
     if current_only:
-        conditions.append(
-            select(CardTerms.id).where(CardTerms.card_id == Card.id, _active_at(as_of)).exists()
-        )
+        conditions.append(_has_active_terms(Card.id, as_of))
     if category:
-        terms_scope = [CardTerms.card_id == Card.id, CashbackRule.category_code == category]
-        if current_only:
-            terms_scope.append(_active_at(as_of))
+        # Категорию ищем в той же версии, которую показываем (presenters.display_terms):
+        # действующая, а если её нет — последняя истёкшая.
+        has_active = _has_active_terms(CardTerms.card_id, as_of)
+        later = aliased(CardTerms)
+        is_latest_expired = and_(
+            CardTerms.valid_to < as_of,
+            ~select(later.id)
+            .where(
+                later.card_id == CardTerms.card_id,
+                later.valid_to < as_of,
+                later.valid_to > CardTerms.valid_to,
+            )
+            .exists(),
+        )
         conditions.append(
             select(CardTerms.id)
             .join(CashbackRule, CashbackRule.terms_id == CardTerms.id)
-            .where(*terms_scope)
+            .where(
+                CardTerms.card_id == Card.id,
+                CashbackRule.category_code == category,
+                or_(_active_at(as_of), and_(~has_active, is_latest_expired)),
+            )
             .exists()
         )
     base = select(Card).join(Bank, Bank.id == Card.bank_id).where(*conditions)
