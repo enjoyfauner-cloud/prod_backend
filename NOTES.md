@@ -38,7 +38,9 @@
 - CI на GitHub прошёл полностью (lint, types, tests, build). ✓
 - Loki + Alloy и контакт Telegram для алертов готовы. Осталось: пользователь вписывает TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID в .env.prod, затем проверить доставку.
 - Фронтенд: адрес dev-сервера пока неизвестен, CORS по умолчанию localhost:3000/5173.
-- Дальше: DEMO.md, сетевой нагрузочный тест, rate limit, уборка, финальный прогон.
+- DEMO.md готов. ✓
+- Сетевой нагрузочный тест: scripts/loadtest.py. 4 воркера uvicorn → ~165 RPS @10 (было 75), p95 122 мс, 0 ошибок. Результаты в DEFENSE.md. ✓
+- Дальше: rate limit, уборка, финальный прогон.
 - Узнать у напарника домены фронтенда → `CORS_ORIGINS`.
 - По желанию: общий лимит на всю карту, пагинация `eligible` для тысяч карт.
 
@@ -70,6 +72,8 @@
 - Postgres на хосте слушает порт **5433** (5432 на ноутбуке занят). Меняется через `POSTGRES_HOST_PORT`.
 - Логи: Alloy собирает stdout контейнеров проекта → Loki (хранение 7 дней). Метки: service, level; request_id идёт как structured metadata.
 - Telegram-контакт: шаблон + entrypoint.sh подставляют токен как строку (Grafana 11 ломается на числовом chat_id из $VAR).
+- API запускается в WEB_CONCURRENCY=4 процессах uvicorn (deploy/start-api.sh), метрики Prometheus в multiprocess-режиме (PROMETHEUS_MULTIPROC_DIR). Gauge каталога: mode=max.
+- Пробовали отдавать ответ рекомендаций без повторной валидации FastAPI: выигрыша нет (узкое место — ожидание БД), откатили.
 - Grafana на порту 3001 (3000 оставлен фронтенду).
 - Метрики с метками по шаблону роута (не по URL), `/metrics` в метрики не пишется.
 - Внешний error-tracker (Sentry) не подключён: ошибки видны в JSON-логе со стеком и request_id, в метрике `app_errors_total` и в алерте доли 5xx.
