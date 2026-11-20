@@ -1,6 +1,23 @@
 # API-контракт «Советник» v1
 
-Документ для frontend. Живая версия контракта появится в Swagger (`/docs`) после этапа 5. Если они разойдутся, источником правды считается OpenAPI, а этот файл я буду обновлять.
+Документ для frontend. Живая схема лежит в Swagger (`/docs`). Если они разойдутся, источником правды считается OpenAPI, а этот файл я буду обновлять.
+
+## Как подключиться к backend
+
+Публичного сервера нет, backend запускается в Docker. Есть два варианта:
+
+**А. Поднять backend у себя (удобно для разработки).** Нужны Docker и git:
+```bash
+git clone https://github.com/enjoyfauner-cloud/prod_backend.git && cd prod_backend
+docker compose up --build -d
+# API:      http://localhost:8000/api/v1   Swagger: http://localhost:8000/docs
+```
+По умолчанию CORS разрешён для `http://localhost:3000` и `http://localhost:5173`. Если dev-сервер на другом порту, запустите так:
+`CORS_ORIGINS=http://localhost:4200 docker compose up -d api`.
+
+**Б. Ходить в backend на ноутбуке напарника по одной Wi-Fi-сети (для защиты).** Базовый URL `http://<IP ноутбука>:8000/api/v1`. Свой адрес (например, `http://192.168.1.23:5173`) пришли мне, я добавлю его в `CORS_ORIGINS`.
+
+Базовый URL лучше вынести в переменную окружения фронтенда (`VITE_API_URL` / `NEXT_PUBLIC_API_URL`), а не зашивать в код.
 
 ## Общее
 
