@@ -1,0 +1,2032 @@
+{
+ "meta": {
+  "demo": true,
+  "note": "ДЕМОНСТРАЦИОННЫЕ данные: банки и условия вымышлены"
+ },
+ "banks": [
+  {
+   "code": "bank-sever",
+   "name": "Банк Север"
+  },
+  {
+   "code": "bank-yug",
+   "name": "Юг-Банк"
+  },
+  {
+   "code": "bank-vostok",
+   "name": "Восток Финанс"
+  },
+  {
+   "code": "bank-zapad",
+   "name": "Запад Кредит"
+  },
+  {
+   "code": "bank-reka",
+   "name": "Река Банк"
+  },
+  {
+   "code": "bank-gorny",
+   "name": "Горный Банк"
+  }
+ ],
+ "cards": [
+  {
+   "code": "bank-sever-produkty",
+   "bank": "bank-sever",
+   "name": "Продуктовая",
+   "description": "7% в супермаркетах, лимит 150 ₽",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "supermarkets",
+       "rate_percent": "7.00",
+       "monthly_limit": "150.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-dvoyka",
+   "bank": "bank-reka",
+   "name": "Двойка",
+   "description": "5% в супермаркетах без лимита",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "supermarkets",
+       "rate_percent": "5.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-semya",
+   "bank": "bank-yug",
+   "name": "Семейная",
+   "description": "5% в супермаркетах и аптеках",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "supermarkets",
+       "rate_percent": "3.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "supermarkets",
+       "rate_percent": "5.00",
+       "monthly_limit": "3000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "5.00",
+       "monthly_limit": "3000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-krupnaya",
+   "bank": "bank-vostok",
+   "name": "Крупная покупка",
+   "description": "6% в супермаркетах от 3000 ₽",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "supermarkets",
+       "rate_percent": "6.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": "3000.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-vsyo",
+   "bank": "bank-zapad",
+   "name": "Всё и сразу",
+   "description": "2% на всё без лимита",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "2.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-arhiv",
+   "bank": "bank-gorny",
+   "name": "Архивная",
+   "description": "Условия истекли 30.09.2026",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-09-30",
+     "checked_at": "2026-09-01",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "supermarkets",
+       "rate_percent": "10.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-reklama",
+   "bank": "bank-sever",
+   "name": "Рекламная",
+   "description": "Партнёрская карта, 1% везде",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-avto",
+   "bank": "bank-vostok",
+   "name": "Авто",
+   "description": "Только АЗС и такси",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "8.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "5.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0001",
+   "bank": "bank-sever",
+   "name": "Тихая Лайт 1",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "2.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0002",
+   "bank": "bank-yug",
+   "name": "Умная Плюс 2",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "restaurants",
+       "rate_percent": "5.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0003",
+   "bank": "bank-vostok",
+   "name": "Тёплая Классика 3",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.25",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "1.50",
+       "monthly_limit": "500.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "3.00",
+       "monthly_limit": "500.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0004",
+   "bank": "bank-zapad",
+   "name": "Яркая Лайт 4",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-09-30",
+     "checked_at": "2026-09-01",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "5.00",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "3.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0005",
+   "bank": "bank-reka",
+   "name": "Тихая Онлайн 5",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "1.50",
+       "monthly_limit": "1000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "5.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "3.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "10.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0006",
+   "bank": "bank-gorny",
+   "name": "Тихая Классика 6",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "7.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "7.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0007",
+   "bank": "bank-sever",
+   "name": "Умная Онлайн 7",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "5.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0008",
+   "bank": "bank-yug",
+   "name": "Городская Макс 8",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "5.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "online",
+       "rate_percent": "3.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "4.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0009",
+   "bank": "bank-vostok",
+   "name": "Городская Мини 9",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "7.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "5.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0010",
+   "bank": "bank-zapad",
+   "name": "Вечерняя Про 10",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "10.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0011",
+   "bank": "bank-reka",
+   "name": "Городская Плюс 11",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "3.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "1.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0012",
+   "bank": "bank-gorny",
+   "name": "Летняя Про 12",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "7.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "2.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0013",
+   "bank": "bank-sever",
+   "name": "Быстрая Престиж 13",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "restaurants",
+       "rate_percent": "1.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0014",
+   "bank": "bank-yug",
+   "name": "Умная Лайт 14",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "1.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "2.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0015",
+   "bank": "bank-vostok",
+   "name": "Летняя Мини 15",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0016",
+   "bank": "bank-zapad",
+   "name": "Тихая Лайт 16",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.25",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "5.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "10.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0017",
+   "bank": "bank-reka",
+   "name": "Городская Мини 17",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "2.00",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0018",
+   "bank": "bank-gorny",
+   "name": "Быстрая Плюс 18",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.75",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "2.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "4.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0019",
+   "bank": "bank-sever",
+   "name": "Умная Про 19",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.75",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "3.50",
+       "monthly_limit": "5000.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "7.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0020",
+   "bank": "bank-yug",
+   "name": "Умная Плюс 20",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "4.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "1.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": null,
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0021",
+   "bank": "bank-vostok",
+   "name": "Тёплая Макс 21",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "3.50",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "3.50",
+       "monthly_limit": "2000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.50",
+       "monthly_limit": "500.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "7.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "7.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "3.00",
+       "monthly_limit": "500.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0022",
+   "bank": "bank-zapad",
+   "name": "Тихая Классика 22",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "4.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0023",
+   "bank": "bank-reka",
+   "name": "Яркая Макс 23",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "10.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "5.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0024",
+   "bank": "bank-gorny",
+   "name": "Яркая Про 24",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "2.50",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.00",
+       "monthly_limit": "500.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "5.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "500.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0025",
+   "bank": "bank-sever",
+   "name": "Простая Престиж 25",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "1.50",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "3.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "3.00",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0026",
+   "bank": "bank-yug",
+   "name": "Звёздная Мини 26",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "5.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "2.00",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0027",
+   "bank": "bank-vostok",
+   "name": "Цифровая Макс 27",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "10.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "1.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0028",
+   "bank": "bank-zapad",
+   "name": "Звёздная Макс 28",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-06-30",
+     "checked_at": "2026-06-20",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "0.75",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "5.00",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "1.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    },
+    {
+     "version": 2,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "10.00",
+       "monthly_limit": null,
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0029",
+   "bank": "bank-reka",
+   "name": "Цифровая Макс 29",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "4.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0030",
+   "bank": "bank-gorny",
+   "name": "Быстрая Мини 30",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "3.00",
+       "monthly_limit": null,
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "3.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0031",
+   "bank": "bank-sever",
+   "name": "Тёплая Макс 31",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "1.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0032",
+   "bank": "bank-yug",
+   "name": "Простая Классика 32",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "4.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "online",
+       "rate_percent": "7.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "5.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0033",
+   "bank": "bank-vostok",
+   "name": "Умная Классика 33",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "5.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": "1000.00"
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "4.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0034",
+   "bank": "bank-zapad",
+   "name": "Звёздная Про 34",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "fuel",
+       "rate_percent": "2.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "2.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0035",
+   "bank": "bank-reka",
+   "name": "Тихая Макс 35",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-01-01",
+     "valid_to": "2026-09-30",
+     "checked_at": "2026-09-01",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "2.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "2.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "10.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0036",
+   "bank": "bank-gorny",
+   "name": "Яркая Престиж 36",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "5.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-sever-card-0037",
+   "bank": "bank-sever",
+   "name": "Звёздная Мини 37",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "7.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "10.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "3.00",
+       "monthly_limit": "300.00",
+       "min_purchase": "500.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-yug-card-0038",
+   "bank": "bank-yug",
+   "name": "Щедрая Онлайн 38",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "pharmacy",
+       "rate_percent": "4.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "7.00",
+       "monthly_limit": "300.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-vostok-card-0039",
+   "bank": "bank-vostok",
+   "name": "Вечерняя Мини 39",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": null,
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "1.00",
+       "monthly_limit": "500.00",
+       "min_purchase": "500.00"
+      },
+      {
+       "category": "other",
+       "rate_percent": "0.50",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "7.00",
+       "monthly_limit": "5000.00",
+       "min_purchase": "1000.00"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-zapad-card-0040",
+   "bank": "bank-zapad",
+   "name": "Умная Мини 40",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": "2027-06-30",
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "online",
+       "rate_percent": "10.00",
+       "monthly_limit": "1000.00",
+       "min_purchase": null
+      },
+      {
+       "category": "taxi",
+       "rate_percent": "5.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-reka-card-0041",
+   "bank": "bank-reka",
+   "name": "Вечерняя Про 41",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "other",
+       "rate_percent": "1.00",
+       "monthly_limit": null,
+       "min_purchase": null
+      },
+      {
+       "category": "restaurants",
+       "rate_percent": "4.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      },
+      {
+       "category": "supermarkets",
+       "rate_percent": "4.00",
+       "monthly_limit": "500.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "code": "bank-gorny-card-0042",
+   "bank": "bank-gorny",
+   "name": "Вечерняя Классика 42",
+   "description": "Сгенерированная демонстрационная карта",
+   "promo_url": "https://example.com/apply",
+   "terms": [
+    {
+     "version": 1,
+     "valid_from": "2026-07-01",
+     "valid_to": null,
+     "checked_at": "2026-11-15",
+     "source": "Демонстрационные данные, сгенерированы для олимпиады",
+     "rules": [
+      {
+       "category": "taxi",
+       "rate_percent": "7.00",
+       "monthly_limit": "2000.00",
+       "min_purchase": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
