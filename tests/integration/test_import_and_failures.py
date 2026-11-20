@@ -4,6 +4,7 @@ import pytest
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
+from sqlalchemy.exc import TimeoutError as SQLAlchemyTimeoutError
 
 from app.config import Settings
 from app.main import create_app
@@ -116,7 +117,7 @@ async def test_name_clash_with_other_card_is_clean_error(app: FastAPI) -> None:
     try:
         await _reimport(app, data)
     except CatalogImportError as exc:
-        assert "Продуктовая" in str(exc)
+        assert "одинаковым названием" in str(exc)
     else:
         raise AssertionError("ожидали CatalogImportError")
     async with app.state.engine.connect() as conn:
@@ -185,3 +186,39 @@ async def test_non_connection_db_error_is_500_not_503(settings: Settings) -> Non
         resp = await ac.get("/boom")
     assert resp.status_code == 500
     assert resp.json()["error"]["code"] == "internal_error"
+
+
+async def test_cards_can_swap_names_in_one_import(app: FastAPI, client: AsyncClient) -> None:
+    data = DEMO.model_dump(mode="json")
+    a, b = _card(data, "bank-sever-produkty"), _card(data, "bank-sever-reklama")
+    a["name"], b["name"] = b["name"], a["name"]
+    await _reimport(app, data)
+    assert (await client.get("/api/v1/cards/bank-sever-produkty")).json()["name"] == "Рекламная"
+    assert (await client.get("/api/v1/cards/bank-sever-reklama")).json()["name"] == "Продуктовая"
+
+
+@pytest.mark.parametrize(
+    ("exc", "status", "code"),
+    [
+        (SQLAlchemyTimeoutError("QueuePool limit reached"), 503, "service_unavailable"),
+        (FileNotFoundError(2, "No such file"), 500, "internal_error"),
+        (PermissionError(13, "Permission denied"), 500, "internal_error"),
+        (ConnectionRefusedError(61, "refused"), 503, "service_unavailable"),
+    ],
+)
+async def test_error_classification_via_http(
+    settings: Settings, exc: Exception, status: int, code: str
+) -> None:
+    app = create_app(settings)
+
+    async def boom() -> None:
+        raise exc
+
+    app.add_api_route("/boom", boom)
+    transport = ASGITransport(app=app)
+    async with (
+        app.router.lifespan_context(app),
+        AsyncClient(transport=transport, base_url="http://t") as ac,
+    ):
+        resp = await ac.get("/boom")
+    assert (resp.status_code, resp.json()["error"]["code"]) == (status, code)

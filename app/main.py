@@ -4,7 +4,7 @@ import asyncio
 import logging
 import os
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,8 +51,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             yield
         finally:
             gauge_task.cancel()
-            with suppress(asyncio.CancelledError):
-                await gauge_task  # дождаться, пока задача отпустит соединение
+            # Дождаться, пока задача отпустит соединение. asyncio.wait не глотает
+            # отмену самого lifespan (в отличие от suppress(CancelledError)).
+            await asyncio.wait([gauge_task])
             await engine.dispose()
             logger.info("shutdown")
 

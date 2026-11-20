@@ -106,6 +106,7 @@ def test_csv_import_format(tmp_path: Path) -> None:
         "bank_code,card_code\nb,c1\n",  # нет обязательных колонок
         "bank_code,bank_name,card_code,card_name,version,valid_from,checked_at,category,"
         "rate_percent\nb,Б,c1,К,v1,2026-01-01,2026-01-01,other,1\n",  # версия не число
+        "bank_code,bank_name\nb,Б\x00\n",  # NUL-байт → csv.Error
     ],
 )
 def test_cli_rejects_broken_csv_without_traceback(

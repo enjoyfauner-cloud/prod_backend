@@ -58,7 +58,17 @@ class Category(Base):
 
 class Card(Base):
     __tablename__ = "cards"
-    __table_args__ = (UniqueConstraint("bank_id", "name", name="uq_cards_bank_id_name"),)
+    __table_args__ = (
+        # DEFERRABLE: при импорте проверяется в конце транзакции (карты могут обменяться
+        # названиями), в остальных случаях ведёт себя как обычное ограничение.
+        UniqueConstraint(
+            "bank_id",
+            "name",
+            name="uq_cards_bank_id_name",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     code: Mapped[str] = mapped_column(String(128), unique=True)

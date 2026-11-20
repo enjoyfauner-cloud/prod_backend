@@ -3,13 +3,16 @@
 Формат: {"error": {"code", "message", "details", "request_id"}}
 """
 
+import errno
 import logging
+import socket
 from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import DBAPIError, InterfaceError, OperationalError
+from sqlalchemy.exc import TimeoutError as SQLAlchemyTimeoutError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.observability.context import get_request_id
@@ -98,8 +101,39 @@ def _message_ru(err: Any) -> str:
         return template
 
 
+# Классы SQLSTATE Postgres, означающие «БД недоступна/перегружена, повторите позже»:
+# 08 — ошибки соединения, 53 — нехватка ресурсов (в т. ч. too many connections),
+# 57 — вмешательство оператора (cannot connect now, admin shutdown, statement timeout).
+_RETRYABLE_SQLSTATE_CLASSES = ("08", "53", "57")
+
+_NETWORK_ERRNOS = {
+    errno.ECONNREFUSED,
+    errno.ECONNRESET,
+    errno.ECONNABORTED,
+    errno.EHOSTUNREACH,
+    errno.ENETUNREACH,
+    errno.ETIMEDOUT,
+    errno.EPIPE,
+}
+
+
 def is_connection_error(exc: DBAPIError) -> bool:
-    return isinstance(exc, OperationalError | InterfaceError) or exc.connection_invalidated
+    """Ошибка БД означает недоступность (→ 503), а не баг в коде или данных (→ 500)."""
+    if isinstance(exc, OperationalError | InterfaceError) or exc.connection_invalidated:
+        return True
+    sqlstate = getattr(exc.orig, "sqlstate", None) or ""
+    return sqlstate[:2] in _RETRYABLE_SQLSTATE_CLASSES
+
+
+def is_network_error(exc: OSError) -> bool:
+    """Сетевой OSError (отказ, DNS, таймаут). FileNotFoundError и т. п. сюда не попадают.
+
+    «Multiple exceptions» — обычный OSError, который asyncio бросает, когда хост
+    резолвится в несколько адресов (IPv4 + IPv6) и ни к одному не подключиться.
+    """
+    if isinstance(exc, ConnectionError | TimeoutError | socket.gaierror):
+        return True
+    return exc.errno in _NETWORK_ERRNOS or str(exc).startswith("Multiple exceptions")
 
 
 _HTTP_CODES = {404: "not_found", 405: "method_not_allowed"}
@@ -139,13 +173,19 @@ def install_error_handlers(app: FastAPI) -> None:
         logger.error("unhandled database error", exc_info=exc)
         return error_response(500, "internal_error", "Внутренняя ошибка сервера")
 
-    # Сетевые ошибки при подключении к БД: отказ, DNS, таймаут, «Multiple exceptions»
-    # (хост резолвится в IPv4 и IPv6). Все они — OSError. Файлов обработчики запросов
-    # не читают, поэтому OSError здесь означает недоступную БД.
     @app.exception_handler(OSError)
-    async def _db_unreachable(_: Request, exc: Exception) -> JSONResponse:
-        logger.error("database unavailable", exc_info=exc)
-        return error_response(503, "service_unavailable", "База данных временно недоступна")
+    async def _os_error(_: Request, exc: OSError) -> JSONResponse:
+        if is_network_error(exc):
+            logger.error("database unavailable", exc_info=exc)
+            return error_response(503, "service_unavailable", "База данных временно недоступна")
+        logger.error("unhandled os error", exc_info=exc)
+        return error_response(500, "internal_error", "Внутренняя ошибка сервера")
+
+    @app.exception_handler(SQLAlchemyTimeoutError)
+    async def _pool_timeout(_: Request, exc: SQLAlchemyTimeoutError) -> JSONResponse:
+        # Пул соединений исчерпан: перегрузка, клиенту стоит повторить запрос.
+        logger.error("database pool exhausted", exc_info=exc)
+        return error_response(503, "service_unavailable", "Сервис перегружен, повторите запрос")
 
     @app.exception_handler(Exception)
     async def _unhandled(_: Request, exc: Exception) -> JSONResponse:

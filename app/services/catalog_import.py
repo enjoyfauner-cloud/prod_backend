@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -131,13 +131,9 @@ async def import_catalog(session: AsyncSession, catalog: CatalogFile) -> ImportR
             )
             .returning(Card.id)
         )
-        try:
-            async with session.begin_nested():
-                card_id = (await session.execute(stmt)).scalar_one()
-        except IntegrityError:
-            raise CatalogImportError(
-                f"{card.code}: у банка {card.bank} уже есть другая карта «{card.name}»"
-            ) from None
+        # Уникальность (банк, название) проверяется отложенно, в конце импорта (миграция 0002):
+        # так файл может, например, поменять названия двух карт местами.
+        card_id = (await session.execute(stmt)).scalar_one()
 
         # Файл — источник правды для условий карты: версии, которых в нём нет, удаляем
         # (правила удалятся каскадом). Иначе в БД могли бы остаться пересекающиеся периоды.
@@ -185,6 +181,15 @@ async def import_catalog(session: AsyncSession, catalog: CatalogFile) -> ImportR
             rules_count += len(terms.rules)
 
     await session.flush()
+    try:
+        # Проверить отложенные ограничения сейчас, а не при COMMIT: ошибку файла
+        # нужно отдать как CatalogImportError, а не как сбой транзакции.
+        await session.execute(text("SET CONSTRAINTS ALL IMMEDIATE"))
+    except IntegrityError as exc:
+        raise CatalogImportError(
+            "после импорта у банка оказались две карты с одинаковым названием "
+            f"(в файле или в БД): {exc.orig}"
+        ) from None
     report = ImportReport(
         banks=len(catalog.banks), cards=len(catalog.cards), terms=terms_count, rules=rules_count
     )

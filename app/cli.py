@@ -2,11 +2,12 @@
 
 import argparse
 import asyncio
+import csv
 import sys
 from pathlib import Path
 
 from pydantic import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import DataError, IntegrityError, SQLAlchemyError
 
 from app.config import get_settings
 from app.db import make_engine, make_sessionmaker
@@ -20,7 +21,7 @@ async def _import(path: Path) -> int:
     except ValidationError as exc:
         print(f"Файл {path} не прошёл проверку:\n{exc}", file=sys.stderr)
         return 2
-    except (KeyError, ValueError) as exc:  # CSV без колонки, версия не число и т. п.
+    except (KeyError, ValueError, csv.Error) as exc:  # нет колонки, не число, NUL-байт…
         print(f"Файл {path} не прошёл проверку: {exc!r}", file=sys.stderr)
         return 2
     except OSError as exc:
@@ -33,6 +34,10 @@ async def _import(path: Path) -> int:
             report = await import_catalog(session, catalog)
     except CatalogImportError as exc:
         print(f"Импорт отменён: {exc}", file=sys.stderr)
+        return 2
+    except (IntegrityError, DataError) as exc:
+        # Данные файла нарушили ограничение БД — это проблема файла, а не БД.
+        print(f"Импорт отменён, данные файла нарушают ограничения БД: {exc.orig}", file=sys.stderr)
         return 2
     except (SQLAlchemyError, OSError) as exc:
         print(f"Импорт отменён, ошибка БД: {exc}", file=sys.stderr)
