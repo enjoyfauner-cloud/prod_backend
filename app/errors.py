@@ -68,6 +68,36 @@ def error_response(
     return JSONResponse(status_code=status, content=error_body(code, message, details))
 
 
+# Понятные пользователю сообщения для частых ошибок валидации Pydantic.
+_MESSAGES_RU = {
+    "missing": "Обязательное поле",
+    "extra_forbidden": "Лишнее поле",
+    "greater_than": "Значение должно быть больше {gt}",
+    "greater_than_equal": "Значение должно быть не меньше {ge}",
+    "less_than_equal": "Значение должно быть не больше {le}",
+    "decimal_parsing": "Ожидается число",
+    "decimal_type": "Ожидается число",
+    "decimal_max_places": "Не больше {decimal_places} знаков после запятой",
+    "decimal_max_digits": "Слишком большое число",
+    "int_parsing": "Ожидается целое число",
+    "date_from_datetime_parsing": "Ожидается дата YYYY-MM-DD",
+    "date_parsing": "Ожидается дата YYYY-MM-DD",
+    "string_pattern_mismatch": "Неверный формат",
+    "literal_error": "Допустимые значения: {expected}",
+    "json_invalid": "Некорректный JSON",
+}
+
+
+def _message_ru(err: Any) -> str:
+    template = _MESSAGES_RU.get(err.get("type", ""))
+    if template is None:
+        return str(err.get("msg", "Некорректное значение"))
+    try:
+        return template.format(**(err.get("ctx") or {}))
+    except (KeyError, IndexError):
+        return template
+
+
 _HTTP_CODES = {404: "not_found", 405: "method_not_allowed"}
 
 
@@ -84,7 +114,7 @@ def install_error_handlers(app: FastAPI) -> None:
                 "field": ".".join(
                     str(p) for p in err["loc"] if p not in ("body", "query", "path", "header")
                 ),
-                "message": err["msg"],
+                "message": _message_ru(err),
             }
             for err in exc.errors()
         ]

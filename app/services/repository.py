@@ -1,0 +1,262 @@
+"""Запросы к БД. Возвращают доменные объекты калькулятора или ORM-модели для API."""
+
+import uuid
+from datetime import date
+from decimal import Decimal
+
+from sqlalchemy import and_, delete, func, or_, select
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from app.models import (
+    BASE_CATEGORY,
+    Bank,
+    Card,
+    CardTerms,
+    CardUsage,
+    CashbackRule,
+    Category,
+    UserCard,
+)
+from app.services.calculator import CardOffer, Rule, Terms, Usage
+
+
+def _active_at(as_of: date):
+    return and_(
+        CardTerms.valid_from <= as_of,
+        or_(CardTerms.valid_to.is_(None), CardTerms.valid_to >= as_of),
+    )
+
+
+def orm_terms_to_domain(t: CardTerms) -> Terms:
+    return Terms(
+        version=t.version,
+        valid_from=t.valid_from,
+        valid_to=t.valid_to,
+        checked_at=t.checked_at,
+        rules={
+            r.category_code: Rule(r.category_code, r.rate_percent, r.monthly_limit, r.min_purchase)
+            for r in t.rules
+        },
+    )
+
+
+# ---------- категории ----------
+
+
+async def list_categories(session: AsyncSession) -> list[Category]:
+    return list((await session.scalars(select(Category).order_by(Category.sort_order))).all())
+
+
+async def get_category(session: AsyncSession, code: str) -> Category | None:
+    return await session.get(Category, code)
+
+
+# ---------- данные для расчёта ----------
+
+
+async def load_offers(
+    session: AsyncSession, category: str, as_of: date, user_id: uuid.UUID | None = None
+) -> list[CardOffer]:
+    """Все карты области поиска с версиями условий (кроме будущих) и только нужными
+    правилами (категория + базовая). Один SQL-запрос."""
+    stmt = (
+        select(Card.code, Card.name, Card.promo_url, Bank.code, Bank.name, CardTerms, CashbackRule)
+        .join(Bank, Bank.id == Card.bank_id)
+        .outerjoin(CardTerms, and_(CardTerms.card_id == Card.id, CardTerms.valid_from <= as_of))
+        .outerjoin(
+            CashbackRule,
+            and_(
+                CashbackRule.terms_id == CardTerms.id,
+                CashbackRule.category_code.in_([category, BASE_CATEGORY]),
+            ),
+        )
+    )
+    if user_id is not None:
+        stmt = stmt.join(UserCard, and_(UserCard.card_id == Card.id, UserCard.user_id == user_id))
+
+    cards: dict[
+        str, tuple[tuple[str, str | None, str, str], dict[int, tuple[CardTerms, dict[str, Rule]]]]
+    ] = {}
+    for code, name, promo, bank_code, bank_name, terms, rule in (await session.execute(stmt)).all():
+        _, versions = cards.setdefault(code, ((name, promo, bank_code, bank_name), {}))
+        if terms is None:
+            continue
+        _, rules = versions.setdefault(terms.id, (terms, {}))
+        if rule is not None:
+            rules[rule.category_code] = Rule(
+                rule.category_code, rule.rate_percent, rule.monthly_limit, rule.min_purchase
+            )
+
+    return [
+        CardOffer(
+            code=code,
+            name=name,
+            bank_code=bank_code,
+            bank_name=bank_name,
+            promo_url=promo,
+            terms=[
+                Terms(t.version, t.valid_from, t.valid_to, t.checked_at, rules)
+                for t, rules in versions.values()
+            ],
+        )
+        for code, ((name, promo, bank_code, bank_name), versions) in cards.items()
+    ]
+
+
+async def load_usage(session: AsyncSession, user_id: uuid.UUID, period: str) -> Usage:
+    stmt = (
+        select(Card.code, CardUsage.category_code, CardUsage.used_cashback)
+        .join(Card, Card.id == CardUsage.card_id)
+        .where(CardUsage.user_id == user_id, CardUsage.period == period)
+    )
+    return {(code, cat): used for code, cat, used in (await session.execute(stmt)).all()}
+
+
+# ---------- каталог ----------
+
+
+def _with_terms():
+    return (selectinload(Card.bank), selectinload(Card.terms).selectinload(CardTerms.rules))
+
+
+async def list_cards(
+    session: AsyncSession,
+    as_of: date,
+    category: str | None,
+    bank: str | None,
+    current_only: bool,
+    limit: int,
+    offset: int,
+) -> tuple[list[Card], int]:
+    conditions = []
+    if bank:
+        conditions.append(Bank.code == bank)
+    if current_only:
+        conditions.append(
+            select(CardTerms.id).where(CardTerms.card_id == Card.id, _active_at(as_of)).exists()
+        )
+    if category:
+        terms_scope = [CardTerms.card_id == Card.id, CashbackRule.category_code == category]
+        if current_only:
+            terms_scope.append(_active_at(as_of))
+        conditions.append(
+            select(CardTerms.id)
+            .join(CashbackRule, CashbackRule.terms_id == CardTerms.id)
+            .where(*terms_scope)
+            .exists()
+        )
+    base = select(Card).join(Bank, Bank.id == Card.bank_id).where(*conditions)
+    total = (await session.scalar(select(func.count()).select_from(base.subquery()))) or 0
+    stmt = (
+        base.options(*_with_terms())
+        .order_by(Bank.name, Card.name, Card.code)
+        .limit(limit)
+        .offset(offset)
+    )
+    return list((await session.scalars(stmt)).all()), total
+
+
+async def get_card(session: AsyncSession, code: str) -> Card | None:
+    stmt = select(Card).where(Card.code == code).options(*_with_terms())
+    return await session.scalar(stmt)
+
+
+async def count_cards(session: AsyncSession, as_of: date) -> tuple[int, int]:
+    total = await session.scalar(select(func.count(Card.id))) or 0
+    current = (
+        await session.scalar(
+            select(func.count(func.distinct(CardTerms.card_id))).where(_active_at(as_of))
+        )
+        or 0
+    )
+    return total, current
+
+
+# ---------- мои карты ----------
+
+
+async def list_my_cards(session: AsyncSession, user_id: uuid.UUID) -> list[UserCard]:
+    stmt = (
+        select(UserCard)
+        .join(Card, Card.id == UserCard.card_id)
+        .where(UserCard.user_id == user_id)
+        .options(
+            selectinload(UserCard.card).selectinload(Card.bank),
+            selectinload(UserCard.card).selectinload(Card.terms).selectinload(CardTerms.rules),
+        )
+        .order_by(UserCard.added_at, Card.code)
+    )
+    return list((await session.scalars(stmt)).all())
+
+
+async def get_my_card(session: AsyncSession, user_id: uuid.UUID, card_id: int) -> UserCard | None:
+    return await session.get(UserCard, (user_id, card_id))
+
+
+async def add_my_card(session: AsyncSession, user_id: uuid.UUID, card_id: int) -> bool:
+    """True — добавлена, False — уже была."""
+    stmt = (
+        insert(UserCard)
+        .values(user_id=user_id, card_id=card_id)
+        .on_conflict_do_nothing()
+        .returning(UserCard.card_id)
+    )
+    return (await session.execute(stmt)).scalar_one_or_none() is not None
+
+
+async def remove_my_card(session: AsyncSession, user_id: uuid.UUID, card_id: int) -> bool:
+    await session.execute(
+        delete(CardUsage).where(CardUsage.user_id == user_id, CardUsage.card_id == card_id)
+    )
+    result = await session.execute(
+        delete(UserCard)
+        .where(UserCard.user_id == user_id, UserCard.card_id == card_id)
+        .returning(UserCard.card_id)
+    )
+    return result.scalar_one_or_none() is not None
+
+
+async def usage_for_cards(
+    session: AsyncSession, user_id: uuid.UUID, period: str
+) -> dict[int, list[CardUsage]]:
+    stmt = (
+        select(CardUsage)
+        .where(CardUsage.user_id == user_id, CardUsage.period == period)
+        .order_by(CardUsage.category_code)
+    )
+    out: dict[int, list[CardUsage]] = {}
+    for u in (await session.scalars(stmt)).all():
+        out.setdefault(u.card_id, []).append(u)
+    return out
+
+
+async def set_usage(
+    session: AsyncSession,
+    user_id: uuid.UUID,
+    card_id: int,
+    category: str,
+    period: str,
+    used: Decimal,
+) -> None:
+    stmt = (
+        insert(CardUsage)
+        .values(
+            user_id=user_id,
+            card_id=card_id,
+            category_code=category,
+            period=period,
+            used_cashback=used,
+        )
+        .on_conflict_do_update(
+            index_elements=[
+                CardUsage.user_id,
+                CardUsage.card_id,
+                CardUsage.category_code,
+                CardUsage.period,
+            ],
+            set_={"used_cashback": used, "updated_at": func.now()},
+        )
+    )
+    await session.execute(stmt)
