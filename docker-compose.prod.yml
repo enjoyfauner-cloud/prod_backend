@@ -1,0 +1,26 @@
+# Продакшен-оверрайд: готовый образ из реестра вместо локальной сборки, БД не торчит наружу.
+#   API_IMAGE=ghcr.io/<owner>/<repo>:<git-sha> \
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+services:
+  postgres:
+    ports: !reset []
+    restart: unless-stopped
+  migrate:
+    image: ${API_IMAGE:?укажите API_IMAGE}
+    build: !reset null
+    environment:
+      APP_ENV: production
+      SEED_DEMO: ${SEED_DEMO:-true}
+  api:
+    image: ${API_IMAGE:?укажите API_IMAGE}
+    build: !reset null
+    environment:
+      APP_ENV: production
+      CORS_ORIGINS: ${CORS_ORIGINS:?укажите домен фронтенда}
+  prometheus:
+    ports: !reset []
+    restart: unless-stopped
+  grafana:
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?задайте пароль Grafana}
+    restart: unless-stopped
