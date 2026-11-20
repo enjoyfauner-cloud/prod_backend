@@ -10,7 +10,7 @@
 - [x] 4. Чистый калькулятор + ранжирование + юнит-тесты
 - [x] 5. REST API, «Мои карты», учёт использованного лимита + интеграционные тесты
 - [x] 6. JSON-логи с request_id, метрики Prometheus, Grafana (дашборд + 2 алерта, provisioned)
-- [~] 7. CI (GitHub Actions), прод-Dockerfile, docker-compose.prod.yml, docs/deploy.md. **Сам деплой не сделан: ждём ответа, куда деплоим**
+- [x] 7. CI (GitHub Actions), прод-Dockerfile, docker-compose.prod.yml, docs/deploy.md. Задеплоено в Docker на ноутбуке (2026-11-20)
 - [x] 8. Бенчмарк на 608 картах, README.md, DEFENSE.md
 
 ## Сделано
@@ -19,8 +19,17 @@
 - Бенчмарк (`python -m scripts.benchmark`, 608 карт): импорт ~6.6 с, чистый расчёт p50 4.4 мс, HTTP p50 65 мс / p95 116 мс. Повторный запрос даёт идентичный результат.
 - Git-коммиты по этапам в ветке `main` (удалённого репозитория пока нет).
 
+## Деплой (2026-11-20)
+- Площадка: Docker на ноутбуке, отдельный compose-проект `sovetnik-prod` (свой том БД), образ `sovetnik-api:7996ecb`.
+- Команда: `docker compose -p sovetnik-prod --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d`
+- `.env.prod` со случайными паролями Postgres и Grafana лежит в корне и НЕ коммитится.
+- Наружу открыты только API :8000 и Grafana :3001. Postgres и Prometheus доступны только внутри docker-сети.
+- Smoke-тесты по всем критериям MVP прошли (health/ready, топ-3, повтор, смена категории, детали карты, мои карты, учёт лимита, валидация, алерты ok, Prometheus собирает метрики).
+- Grafana: анонимный доступ только на чтение (дашборд для жюри), админка закрыта паролем из `.env.prod`.
+- Dev-стек (`docker compose up`) остановлен, его том `sovetnik_pgdata` сохранён. Одновременно оба стека не запустить: заняты порты 8000/3001.
+
 ## Осталось
-- **Выбрать, куда деплоить** (VPS с Docker / облако), затем: создать GitHub-репозиторий, push, CI соберёт образ, запуск по docs/deploy.md.
+- Если жюри нужен публичный URL: VPS + GitHub-репозиторий (CI соберёт образ в GHCR), запуск по docs/deploy.md.
 - Узнать у напарника домены фронтенда → `CORS_ORIGINS`.
 - По желанию: общий лимит на всю карту, пагинация `eligible` для тысяч карт.
 
