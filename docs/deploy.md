@@ -36,22 +36,32 @@ curl -fsS -X POST http://<host>:8000/api/v1/recommendations \
 
 ## Откат
 
+В примерах `C` — сокращение для
+`docker compose -p sovetnik-prod --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml`.
+
 ### 1. Откат образа (код)
 ```bash
-export API_IMAGE=ghcr.io/<owner>/<repo>:<предыдущий-sha>
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d api
+# в .env.prod: API_IMAGE=<registry>/sovetnik-api:<предыдущий-sha>
+C up -d --no-deps api
 ```
-Схема БД при этом не меняется. Это безопасно, если новая миграция была обратно совместимой (см. правило ниже).
+Схема БД при этом не меняется. Это безопасно, если новая миграция обратно совместима (см. правило ниже).
 
-### 2. Откат миграции (схема)
+### 2. Откат миграции (схема): запускать НОВЫМ образом
 ```bash
-# посмотреть текущую ревизию и историю
-docker compose run --rm migrate alembic current
-docker compose run --rm migrate alembic history
-# откатить на одну ревизию назад (или на конкретную: alembic downgrade 0001)
-docker compose run --rm migrate alembic downgrade -1
+# Важно: downgrade выполняет образ, в котором ЕСТЬ откатываемая миграция.
+# Старый образ о ней не знает и упадёт с "Can't locate revision identified by '0002'".
+API_IMAGE=<registry>/sovetnik-api:<новый-sha> C run --rm migrate alembic current
+API_IMAGE=<registry>/sovetnik-api:<новый-sha> C run --rm migrate alembic downgrade 0001
 ```
-Порядок: **сначала откатить образ, потом схему**. Старый код не должен работать с новой схемой дольше, чем нужно.
+Порядок: **сначала откатить образ, потом схему** (тем же новым образом). Старый код не должен работать с новой схемой дольше, чем нужно.
+
+Отрепетировано 2026-11-20 на локальном prod-стеке: `c9ce087` (схема 0002) → код `d6f0c22` → схема `0001` → снова `c9ce087` + `0002`. Smoke-тесты зелёные на каждом шаге.
+
+### Вперёд после отката
+```bash
+# в .env.prod: API_IMAGE=<новый-sha>
+C up -d        # migrate применит alembic upgrade head, затем перезапустится api
+```
 
 ### Правило для миграций (как снижаем риск)
 - Каждая миграция имеет рабочий `downgrade()`. CI проверяет цикл `upgrade head → downgrade base → upgrade head` и `alembic check` (модели = схема).
