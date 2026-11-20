@@ -68,13 +68,41 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
       GF_PLUGINS_PREINSTALL_DISABLED: "true"  # работаем офлайн, без скачивания плагинов
+      # Уведомления алертов в Telegram (см. docs/deploy.md). Без них алерты видны только в Grafana.
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-not-configured}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-0}
+    entrypoint: ["sh", "/etc/grafana/entrypoint.sh"]
     volumes:
       - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/templates:/etc/grafana/templates:ro
+      - ./deploy/grafana/entrypoint.sh:/etc/grafana/entrypoint.sh:ro
       - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports:
       - "3001:3000"
     depends_on:
       - prometheus
+      - loki
+
+  # Хранилище логов: поиск по request_id прямо в Grafana (Explore → Loki).
+  loki:
+    image: grafana/loki:3.3.2
+    command: ["-config.file=/etc/loki/loki.yml"]
+    volumes:
+      - ./deploy/loki/loki.yml:/etc/loki/loki.yml:ro
+      - lokidata:/loki
+    restart: unless-stopped
+
+  # Сборщик логов: читает stdout контейнеров этого compose-проекта и отправляет в Loki.
+  alloy:
+    image: grafana/alloy:v1.5.1
+    command: ["run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data"]
+    volumes:
+      - ./deploy/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+    restart: unless-stopped
 
 volumes:
   pgdata:
+  lokidata:

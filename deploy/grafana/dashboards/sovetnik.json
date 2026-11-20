@@ -2,7 +2,7 @@
  "uid": "sovetnik-api",
  "title": "Советник — API",
  "schemaVersion": 39,
- "version": 1,
+ "version": 2,
  "refresh": "10s",
  "time": {
   "from": "now-30m",
@@ -403,10 +403,84 @@
      }
     }
    ]
+  },
+  {
+   "id": 12,
+   "type": "logs",
+   "title": "Логи API (фильтр по request_id сверху)",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 34,
+    "w": 24,
+    "h": 10
+   },
+   "options": {
+    "showTime": true,
+    "wrapLogMessage": true,
+    "sortOrder": "Descending",
+    "enableLogDetails": true
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "{service=\"api\"} |= \"$request_id\""
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "type": "logs",
+   "title": "Ошибки и предупреждения (ERROR / WARNING)",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 44,
+    "w": 24,
+    "h": 8
+   },
+   "options": {
+    "showTime": true,
+    "wrapLogMessage": true,
+    "sortOrder": "Descending",
+    "enableLogDetails": true
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "{service=~\"api|migrate\", level=~\"ERROR|WARNING\"}"
+    }
+   ]
   }
  ],
  "templating": {
-  "list": []
+  "list": [
+   {
+    "name": "request_id",
+    "label": "request_id (поиск в логах)",
+    "type": "textbox",
+    "query": "",
+    "current": {
+     "text": "",
+     "value": ""
+    },
+    "hide": 0
+   }
+  ]
  },
  "annotations": {
   "list": []

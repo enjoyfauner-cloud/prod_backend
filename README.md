@@ -4,7 +4,9 @@
 
 > **Каталог демонстрационный.** Банки и условия вымышлены и сгенерированы для олимпиады.
 
-Стек: Python 3.13, FastAPI, Pydantic v2, PostgreSQL 17, SQLAlchemy 2 (async), Alembic, Prometheus, Grafana, Docker Compose, GitHub Actions.
+Стек: Python 3.13, FastAPI, Pydantic v2, PostgreSQL 17, SQLAlchemy 2 (async), Alembic, Prometheus, Grafana, Loki + Alloy, Docker Compose, GitHub Actions.
+
+CI: https://github.com/enjoyfauner-cloud/prod_backend/actions
 
 ## Запуск одной командой
 
@@ -12,7 +14,7 @@
 docker compose up --build -d
 ```
 
-Поднимутся `postgres`, `migrate` (миграции + импорт демо-каталога), `api`, `prometheus`, `grafana`.
+Поднимутся `postgres`, `migrate` (миграции + импорт демо-каталога), `api`, `prometheus`, `grafana`, `loki` + `alloy` (логи).
 
 | Что | Адрес |
 |---|---|
@@ -21,7 +23,8 @@ docker compose up --build -d
 | Health / Ready | http://localhost:8000/health, http://localhost:8000/ready |
 | Метрики | http://localhost:8000/metrics |
 | Prometheus | http://localhost:9090 |
-| Grafana | http://localhost:3001 (admin / admin), дашборд **Sovetnik → «Советник — API»** |
+| Grafana | http://localhost:3001 (admin / admin), дашборд **Sovetnik → «Советник — API»** (метрики + логи с поиском по request_id) |
+| Логи | Grafana → Explore → Loki: `{service="api"} \|= "<request_id>"` |
 | Postgres | localhost:**5433** (порт хоста меняется через `POSTGRES_HOST_PORT`) |
 
 Проверка сценария из кейса:

@@ -76,3 +76,26 @@ C up -d        # migrate применит alembic upgrade head, затем пе�
 | Битый файл справочника | импорт проверяет весь файл заранее и работает в одной транзакции: либо применяется весь, либо ничего |
 | Необработанное исключение | клиент получает `500 internal_error` с `request_id`, стек пишется в JSON-лог, растёт `app_errors_total{code="internal_error"}`, срабатывает алерт доли 5xx |
 | Падение процесса API | `restart: unless-stopped`, healthcheck по `/ready` |
+
+## Уведомления алертов в Telegram
+
+1. В Telegram откройте **@BotFather** → `/newbot` → получите токен вида `123456:ABC...`.
+2. Напишите своему боту любое сообщение (иначе он не сможет вам писать).
+3. Узнайте chat_id: откройте в браузере `https://api.telegram.org/bot<ТОКЕН>/getUpdates` и найдите `"chat":{"id":…}`.
+4. Допишите в `.env.prod` (файл не коммитится):
+   ```
+   TELEGRAM_BOT_TOKEN=123456:ABC...
+   TELEGRAM_CHAT_ID=123456789
+   ```
+5. Перезапустите Grafana: `C up -d grafana`.
+6. Проверка: Grafana → Alerting → Contact points → `telegram` → **Test**.
+
+Без токена контакт создаётся с заглушкой: алерты видны в Grafana (Alerting → Alert rules), но сообщения не уходят.
+
+## Логи (Loki)
+
+Alloy читает stdout контейнеров стека и отправляет их в Loki (хранение 7 дней). Поиск:
+- дашборд «Советник — API»: поле `request_id` сверху фильтрует панель «Логи API»;
+- Grafana → Explore → Loki: `{service="api"} | json | status >= 500` или `{service="api"} |= "<request_id>"`.
+
+`request_id` клиент получает в заголовке `X-Request-Id` и в теле любой ошибки, поэтому по жалобе пользователя запрос находится за секунды.

@@ -1,0 +1,52 @@
+// Alloy: собирает stdout контейнеров стека и отправляет в Loki.
+// Метки (индексируемые) — только с малым числом значений: service, level.
+// request_id — structured metadata: по нему можно фильтровать, но индекс не раздувается.
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "compose" {
+  targets = discovery.docker.containers.targets
+
+  // только контейнеры нашего compose-проекта
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    regex         = "sovetnik.*"
+    action        = "keep"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "project"
+  }
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.compose.output
+  forward_to = [loki.process.json.receiver]
+}
+
+loki.process "json" {
+  // Наши логи — JSON. Для чужих (postgres, grafana) стадии просто ничего не найдут.
+  stage.json {
+    expressions = { level = "level", request_id = "request_id" }
+  }
+  stage.labels {
+    values = { level = "" }
+  }
+  stage.structured_metadata {
+    values = { request_id = "" }
+  }
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
