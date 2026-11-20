@@ -3,6 +3,7 @@
 import uuid
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
 from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
@@ -70,8 +71,24 @@ async def load_offers(
 ) -> list[CardOffer]:
     """Все карты области поиска с версиями условий (кроме будущих) и только нужными
     правилами (категория + базовая). Один SQL-запрос."""
+    # Только нужные колонки, без ORM-объектов: это заметно дешевле на сотнях карт.
     stmt = (
-        select(Card.code, Card.name, Card.promo_url, Bank.code, Bank.name, CardTerms, CashbackRule)
+        select(
+            Card.code,
+            Card.name,
+            Card.promo_url,
+            Bank.code,
+            Bank.name,
+            CardTerms.id,
+            CardTerms.version,
+            CardTerms.valid_from,
+            CardTerms.valid_to,
+            CardTerms.checked_at,
+            CashbackRule.category_code,
+            CashbackRule.rate_percent,
+            CashbackRule.monthly_limit,
+            CashbackRule.min_purchase,
+        )
         .join(Bank, Bank.id == Card.bank_id)
         .outerjoin(CardTerms, and_(CardTerms.card_id == Card.id, CardTerms.valid_from <= as_of))
         .outerjoin(
@@ -85,18 +102,17 @@ async def load_offers(
     if user_id is not None:
         stmt = stmt.join(UserCard, and_(UserCard.card_id == Card.id, UserCard.user_id == user_id))
 
-    cards: dict[
-        str, tuple[tuple[str, str | None, str, str], dict[int, tuple[CardTerms, dict[str, Rule]]]]
-    ] = {}
-    for code, name, promo, bank_code, bank_name, terms, rule in (await session.execute(stmt)).all():
+    # code -> (данные карты, {terms_id: (version, valid_from, valid_to, checked_at, rules)})
+    cards: dict[str, tuple[tuple[str, str | None, str, str], dict[int, tuple[Any, ...]]]] = {}
+    for row in (await session.execute(stmt)).all():
+        (code, name, promo, bank_code, bank_name, terms_id, version, valid_from, valid_to,
+         checked_at, rule_cat, rate, limit, min_purchase) = row  # fmt: skip
         _, versions = cards.setdefault(code, ((name, promo, bank_code, bank_name), {}))
-        if terms is None:
+        if terms_id is None:
             continue
-        _, rules = versions.setdefault(terms.id, (terms, {}))
-        if rule is not None:
-            rules[rule.category_code] = Rule(
-                rule.category_code, rule.rate_percent, rule.monthly_limit, rule.min_purchase
-            )
+        *_, rules = versions.setdefault(terms_id, (version, valid_from, valid_to, checked_at, {}))
+        if rule_cat is not None:
+            rules[rule_cat] = Rule(rule_cat, rate, limit, min_purchase)
 
     return [
         CardOffer(
@@ -105,10 +121,7 @@ async def load_offers(
             bank_code=bank_code,
             bank_name=bank_name,
             promo_url=promo,
-            terms=[
-                Terms(t.version, t.valid_from, t.valid_to, t.checked_at, rules)
-                for t, rules in versions.values()
-            ],
+            terms=[Terms(*t) for t in versions.values()],
         )
         for code, ((name, promo, bank_code, bank_name), versions) in cards.items()
     ]

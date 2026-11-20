@@ -16,7 +16,7 @@ COPY alembic.ini ./
 COPY alembic ./alembic
 COPY app ./app
 COPY data/demo_catalog.json ./data/demo_catalog.json
-COPY deploy/migrate.sh ./deploy/migrate.sh
+COPY deploy/migrate.sh deploy/start-api.sh ./deploy/
 
 RUN useradd --create-home --uid 10001 appuser
 USER appuser
@@ -25,5 +25,9 @@ USER appuser
 ARG APP_VERSION=dev
 ENV APP_VERSION=${APP_VERSION}
 
+# Процессы uvicorn (по числу ядер, которые готовы отдать API) и общий каталог метрик
+ENV WEB_CONCURRENCY=4 \
+    PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+
 EXPOSE 8000
-CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-access-log"]
+CMD ["sh", "/app/deploy/start-api.sh"]

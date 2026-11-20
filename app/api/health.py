@@ -4,11 +4,12 @@ import logging
 
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse
-from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+from prometheus_client import CONTENT_TYPE_LATEST
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.errors import error_response
+from app.observability.metrics import collect_metrics
 
 router = APIRouter(tags=["service"])
 logger = logging.getLogger("app.health")
@@ -37,4 +38,4 @@ async def ready(request: Request) -> Response:
 
 @router.get("/metrics", summary="Метрики Prometheus", include_in_schema=False)
 async def metrics() -> Response:
-    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+    return Response(collect_metrics(), media_type=CONTENT_TYPE_LATEST)
