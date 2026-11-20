@@ -1,0 +1,79 @@
+# Локальный запуск всего стека одной командой: docker compose up --build
+name: sovetnik
+
+x-app-env: &app-env
+  APP_ENV: ${APP_ENV:-local}
+  DATABASE_URL: postgresql+asyncpg://sovetnik:${POSTGRES_PASSWORD:-sovetnik}@postgres:5432/sovetnik
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Moscow}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: sovetnik
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sovetnik}
+      POSTGRES_DB: sovetnik
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sovetnik -d sovetnik"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Одноразовый контейнер: миграции + импорт демо-каталога. API стартует только после него.
+  migrate:
+    build: .
+    environment:
+      <<: *app-env
+      SEED_DEMO: ${SEED_DEMO:-true}
+    command: ["sh", "/app/deploy/migrate.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    environment: *app-env
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/ready').status == 200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:

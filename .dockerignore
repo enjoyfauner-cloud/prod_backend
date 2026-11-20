@@ -1,0 +1,11 @@
+.venv
+.git
+.idea
+**/__pycache__
+.pytest_cache
+.ruff_cache
+.env
+tests
+hello_world
+data/generated_*.json
+docs
